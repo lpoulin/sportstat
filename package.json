@@ -1,34 +1,32 @@
 {
   "name": "sportstat",
   "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.4.1",
-    "@testing-library/user-event": "^7.2.1",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-scripts": "3.4.0"
+  "bin": {
+    "sportstat": "bin/sportstat.js"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "devDependencies": {
+    "@aws-cdk/assert": "1.25.0",
+    "@types/jest": "^24.0.22",
+    "@types/node": "10.17.5",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "aws-cdk": "1.25.0",
+    "ts-node": "^8.1.0",
+    "typescript": "~3.7.2"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "dependencies": {
+    "@aws-cdk/aws-codebuild": "^1.25.0",
+    "@aws-cdk/aws-codecommit": "^1.25.0",
+    "@aws-cdk/aws-codedeploy": "^1.25.0",
+    "@aws-cdk/aws-codepipeline-actions": "^1.25.0",
+    "@aws-cdk/aws-s3": "^1.25.0",
+    "@aws-cdk/core": "^1.25.0",
+    "source-map-support": "^0.5.16"
   }
 }
