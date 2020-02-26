@@ -4,7 +4,7 @@ import codepipeline = require('@aws-cdk/aws-codepipeline');
 import codepipeline_actions = require('@aws-cdk/aws-codepipeline-actions');
 import lambda = require('@aws-cdk/aws-lambda');
 import s3 = require('@aws-cdk/aws-s3');
-import { App, Stack, StackProps } from '@aws-cdk/core';
+import { App, Stack, StackProps, SecretValue } from '@aws-cdk/core';
 import secretsmanager = require('@aws-cdk/aws-secretsmanager')
 
 export interface PipelineStackProps extends StackProps {
@@ -79,7 +79,7 @@ export class PipelineStack extends Stack {
         actionName: 'GitHub',
         owner: 'lpoulin',
         repo: 'sportstat',
-        oauthToken: githubToken.secretValue['value'] // get github oauth token from secret manager
+        oauthToken: githubToken.secretValueFromJson('key') // get github oauth token from secret manager
     });
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
     const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
