@@ -5,6 +5,7 @@ import codepipeline_actions = require('@aws-cdk/aws-codepipeline-actions');
 import lambda = require('@aws-cdk/aws-lambda');
 import s3 = require('@aws-cdk/aws-s3');
 import { App, Stack, StackProps } from '@aws-cdk/core';
+import secretsmanager = require('@aws-cdk/aws-secretsmanager')
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -69,7 +70,17 @@ export class PipelineStack extends Stack {
       },
     });
 
+    const githubToken = secretsmanager.Secret.fromSecretAttributes(this, "GitHubPersonalAccessToken", {
+        secretArn: "arn:aws:secretsmanager:us-east-2:629357313440:secret:GitHubPersonalAccessToken-57xYRN"
+    });
     const sourceOutput = new codepipeline.Artifact();
+    const githubSource = new codepipeline_actions.GitHubSourceAction({
+        output: sourceOutput,
+        actionName: 'GitHub',
+        owner: 'lpoulin',
+        repo: 'sportstat',
+        oauthToken: githubToken.secretValue['value'] // get github oauth token from secret manager
+    });
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');
     const lambdaBuildOutput = new codepipeline.Artifact('LambdaBuildOutput');
     new codepipeline.Pipeline(this, 'Pipeline', {
@@ -77,11 +88,7 @@ export class PipelineStack extends Stack {
         {
           stageName: 'Source',
           actions: [
-            new codepipeline_actions.CodeCommitSourceAction({
-              actionName: 'CodeCommit_Source',
-              repository: code,
-              output: sourceOutput,
-            }),
+            githubSource
           ],
         },
         {
