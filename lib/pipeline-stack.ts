@@ -4,7 +4,7 @@ import codepipeline = require('@aws-cdk/aws-codepipeline');
 import codepipeline_actions = require('@aws-cdk/aws-codepipeline-actions');
 import lambda = require('@aws-cdk/aws-lambda');
 import s3 = require('@aws-cdk/aws-s3');
-import { App, Stack, StackProps, SecretValue } from '@aws-cdk/core';
+import { App, Stack, StackProps } from '@aws-cdk/core';
 import secretsmanager = require('@aws-cdk/aws-secretsmanager')
 
 export interface PipelineStackProps extends StackProps {
@@ -14,10 +14,6 @@ export interface PipelineStackProps extends StackProps {
 export class PipelineStack extends Stack {
   constructor(app: App, id: string, props: PipelineStackProps) {
     super(app, id, props);
-
-    const code = codecommit.Repository.fromRepositoryName(this, 'ImportedRepo',
-      'sportstat');
-
     const cdkBuild = new codebuild.PipelineProject(this, 'CdkBuild', {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: '0.2',
@@ -94,12 +90,12 @@ export class PipelineStack extends Stack {
         {
           stageName: 'Build',
           actions: [
-            new codepipeline_actions.CodeBuildAction({
-              actionName: 'Lambda_Build',
-              project: lambdaBuild,
-              input: sourceOutput,
-              outputs: [lambdaBuildOutput],
-            }),
+            // new codepipeline_actions.CodeBuildAction({
+            //   actionName: 'Lambda_Build',
+            //   project: lambdaBuild,
+            //   input: sourceOutput,
+            //   outputs: [lambdaBuildOutput],
+            // }),
             new codepipeline_actions.CodeBuildAction({
               actionName: 'CDK_Build',
               project: cdkBuild,
@@ -108,21 +104,21 @@ export class PipelineStack extends Stack {
             }),
           ],
         },
-        {
-          stageName: 'Deploy',
-          actions: [
-            new codepipeline_actions.CloudFormationCreateUpdateStackAction({
-              actionName: 'Lambda_CFN_Deploy',
-              templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
-              stackName: 'LambdaDeploymentStack',
-              adminPermissions: true,
-              parameterOverrides: {
-                ...props.lambdaCode.assign(lambdaBuildOutput.s3Location),
-              },
-              extraInputs: [lambdaBuildOutput],
-            }),
-          ],
-        },
+        // {
+        //   stageName: 'Deploy',
+        //   actions: [
+        //     new codepipeline_actions.CloudFormationCreateUpdateStackAction({
+        //       actionName: 'Lambda_CFN_Deploy',
+        //       templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
+        //       stackName: 'LambdaDeploymentStack',
+        //       adminPermissions: true,
+        //       parameterOverrides: {
+        //         ...props.lambdaCode.assign(lambdaBuildOutput.s3Location),
+        //       },
+        //       extraInputs: [lambdaBuildOutput],
+        //     }),
+        //   ],
+        // },
       ],
     });
   }

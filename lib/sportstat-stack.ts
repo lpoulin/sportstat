@@ -1,30 +1,26 @@
-import codedeploy = require('@aws-cdk/aws-codedeploy');
-import lambda = require('@aws-cdk/aws-lambda');
-import { App, Stack, StackProps } from '@aws-cdk/core';
+import cdk = require('@aws-cdk/core');
+import ec2 = require('@aws-cdk/aws-ec2');
+import ecs = require('@aws-cdk/aws-ecs');
+import ecs_patterns = require('@aws-cdk/aws-ecs-patterns');
       
-export class SportstatStack extends Stack {
-  public readonly lambdaCode: lambda.CfnParametersCode;
+export class SportstatStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
       
-  constructor(app: App, id: string, props?: StackProps) {
-    super(app, id, props);
-      
-    this.lambdaCode = lambda.Code.fromCfnParameters();
-      
-    const func = new lambda.Function(this, 'Lambda', {
-      code: this.lambdaCode,
-      handler: 'index.handler',
-      runtime: lambda.Runtime.NODEJS_10_X,
-    });
-      
-    const version = func.addVersion(new Date().toISOString());
-    const alias = new lambda.Alias(this, 'LambdaAlias', {
-      aliasName: 'Prod',
-      version,
-    });
-      
-    new codedeploy.LambdaDeploymentGroup(this, 'DeploymentGroup', {
-      alias,
-      deploymentConfig: codedeploy.LambdaDeploymentConfig.LINEAR_10PERCENT_EVERY_1MINUTE,
+    const vpc = new ec2.Vpc(this, 'MyVPC', { maxAzs: 2 });
+    const cluster = new ecs.Cluster(this, 'Cluster', { vpc });
+
+    new ecs_patterns.ApplicationLoadBalancedFargateService(this, "FargateService", {
+      cluster,
+      taskImageOptions: {
+        image: ecs.ContainerImage.fromRegistry("lucienpoulin/helloworld")
+      },
     });
   }
 }
+
+const app = new cdk.App();
+
+new SportstatStack(app, 'Sportstat');
+
+app.synth();
