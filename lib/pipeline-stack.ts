@@ -8,7 +8,6 @@ import { App, Stack, StackProps } from '@aws-cdk/core';
 import secretsmanager = require('@aws-cdk/aws-secretsmanager')
 
 export interface PipelineStackProps extends StackProps {
-  readonly lambdaCode: lambda.CfnParametersCode;
 }
 
 export class PipelineStack extends Stack {

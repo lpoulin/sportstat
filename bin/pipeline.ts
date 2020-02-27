@@ -8,7 +8,7 @@ const app = new App();
 
 const lambdaStack = new SportstatStack(app, 'LambdaStack');
 new PipelineStack(app, 'PipelineDeployingLambdaStack', {
-  lambdaCode: lambdaStack.lambdaCode,
+  
 });
 
 app.synth();
